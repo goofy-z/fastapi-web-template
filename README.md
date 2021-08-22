@@ -1,10 +1,10 @@
-##简介
+# 简介
 
 这是一个`fastapi`的脚手架项目，解释器版本至少是python3.7 +，项目集成了`sqlalchemy2(1.4+)`、`JWT Auth`、`websocket`、`i18n`等常用功能，项目的目录结构也比较简单，也封装了一系列的web开发过程中会用到的工具，欢迎大家给项目提提建议。
 
-###目录结构：
+## 目录结构
 
-```
+```shell
 .
 ├── app  # 业务应用目录，下属多个应用模块
 │   ├── __init__.py
@@ -32,13 +32,11 @@
 └── requirements.txt  # 依赖文件
 ```
 
+## 主要功能模块
 
+### 1. SQLAlchemy
 
-###主要功能：
-
-#### 1. SQLAlchemy
-
-`1.4+`的版本，这个版本支持异步IO调用，但是相应的得使用异步的数据库适配器，这里使用的是`aiomysql`, 同时1.4版本已经支持SQLA的2.0写法，当然也是兼容旧版写法的。[两者区别具体查看文档](https://docs.sqlalchemy.org/en/14/changelog/migration_20.html)
+`1.4+`的版本，这个版本支持异步IO，但是相应的得使用异步的数据库适配器，这里使用的是`aiomysql`, 同时1.4版本已经支持SQLA的2.0写法，当然也是兼容旧版写法的。[两者区别具体查看文档](https://docs.sqlalchemy.org/en/14/changelog/migration_20.html)
 
 与SQLA相关的代码在`/core/storage`下：
 
@@ -54,19 +52,19 @@ g.db.execute(...)
 
 获取`engine`对象
 
-```
+```python
 from core.storage import db
 db.engine.execute(...)
 ```
 
-#### 2.dependencies
+### 2.dependencies
 
 项目下所有的fastapi依赖注入函数都在`/core/dependencies`：
 
 - auth_dependen: 基础依赖注入，所有的AP都需要引入这个依赖，用于提取请求头中的`Accept-Language`来设置全局变量`local`, 用于`i18n`的翻译。
 - auth_dependen: 基于`Authorization`请求头的JWT认证。
 
-#### 3. config
+### 3. config
 
 项目的配置文件目录，分为两种环境配置文件`dev`和`prod`。启动项目时引入哪个配置文件取决于环境变量配置`CONFIG_NAME`，默认是`dev`。
 
@@ -83,7 +81,7 @@ db.engine.execute(...)
 - DB_MAX_OVERFLOW：连接池缓冲个数
 - DB_POOL_SIZE： 连接池大小
 
-#### 4. schema
+### 4. schema
 
 项目的序列化和反序列化是基于pydantic实现的，业务应用需要继承`BaseSchema`来扩展各自需要的序列化器。提供两种序列化器：
 
@@ -92,7 +90,7 @@ db.engine.execute(...)
 
 还提供了数据分页器：`paginate_handler`，可以接收`select`对象或迭代对象，返回分页后的数据字典。
 
-#### 5. i18n
+### 5. i18n
 
 创建翻译文件在后面的`manager.py`里会有介绍，如果是已有的翻译文件直接放入`/core/i18n/lang`里。同时，项目里需要使用翻译的地方可以如下使用，具体翻译成何种语言取决于全局变量`g.locale`
 
@@ -101,7 +99,7 @@ from core.i18n import gettext
 t = gettext("test") # t为翻译后的内容
 ```
 
-#### 6. manager.py
+### 6. manager.py
 
 项目下有一个类似`django`的项目管理工具，现在提供了两个命令：
 
@@ -115,7 +113,7 @@ t = gettext("test") # t为翻译后的内容
 
    **run**: 编译message.po。
 
-#### 7. middleware
+### 7. middleware
 
 项目下的`/core/middleware`是所有的ASGI的中间件，目前共有两个中间件
 
