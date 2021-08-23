@@ -119,3 +119,25 @@ t = gettext("test") # t为翻译后的内容
 
 - `fastapi-globals.py`： `g`对象的实现，基于contextvar实现
 - `session.py`: 注册全局`session`
+
+#### 8.websocket
+
+项目自带了websocket应用，实现了ws连接管理类`ConnectionManager`。目前是将连接信息存储在内存中，第一次连接时需要进行token验证，之后服务端会定时进行心跳检测，所以需要客户端隔一段时间就发送心跳包，否则服务端会主动断开连接。
+
+token验证格式：
+
+```json
+{
+  "Op": "bind",
+  "SessionID": "token"
+}
+```
+
+心跳检测包：
+
+```json
+{
+  "Op": "heartbeat",
+  "SessionID": "token"
+}
+```
