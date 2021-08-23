@@ -27,9 +27,6 @@ def configure_models():
     add model to sqla metadata
     """
     # +gencode:register-router
-    from app.demp.apis import router as demp_router
-    app.include_router(demp_router)
-
 
 
 def register_router(app: FastAPI):
@@ -37,9 +34,6 @@ def register_router(app: FastAPI):
     注册路由
     """
     # +gencode:register-router
-    from app.demp.apis import router as demp_router
-    app.include_router(demp_router)
-
     from app.ws.apis import router as ws_router
     app.include_router(ws_router, prefix="/wss")
 
@@ -64,9 +58,9 @@ def init_async():
 
 app = FastAPI(
     name=config.SERVICE_NAME,
-    openapi_url="/v2/openapi/openapi.json",
-    docs_url="/v2/openapi/docs",
-    redoc_url="/v2/openapi/redoc",
+    openapi_url="/v1/openapi/openapi.json",
+    docs_url="/v1/openapi/docs",
+    redoc_url="/v1/openapi/redoc",
     debug=not config.PROD,
     exception_handlers={APIException: http_exception_handler},
 )
@@ -77,4 +71,4 @@ init_async()
 
 
 if __name__ == "__main__":
-    uvicorn.run("app_runner:app", host="0.0.0.0", port=8080, log_level="debug", debug=not config.PROD)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="debug", debug=not config.PROD)

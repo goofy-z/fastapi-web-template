@@ -1,6 +1,6 @@
 from app.ws.schema import SockJSInfoRes
 from fastapi.applications import FastAPI
-from app.ws.views import broadcast_msg_view, sockjs_iframe_view, sockjs_info_view, ws_view, test_html_view
+from app.ws.views import broadcast_msg_view, ws_view, test_html_view
 from fastapi import APIRouter
 
 

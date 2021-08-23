@@ -21,20 +21,12 @@ def str2float(v):
     return int(v)
 
 
-MAIN_DIRECTORY = os.path.dirname(os.path.dirname(__file__))
-
-
-def get_full_path(*path):
-    return os.path.abspath(os.path.join(MAIN_DIRECTORY, *path))
-
-
 class Base:
     # ------------------- need config ---------------------
     DATABASE_MYSQL_URL = os.getenv("DATABASE_MYSQL_URL", "root:dangerous@127.0.0.1:3600/kongtianbei")
 
     # ------------------- option ---------------------
     CONFIG_NAME = "BASE"
-    MAIN_DIRECTORY = MAIN_DIRECTORY
     SERVICE_NAME = os.getenv("SERVICE_NAME", "fastapi-web-template")
 
     TZ = os.getenv("TZ", "Asia/Shanghai")

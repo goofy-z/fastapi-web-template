@@ -28,11 +28,5 @@ class Config:
     def __getattr__(self, item):
         return getattr(self.config, item)
 
-    def get_full_path(self, *path):
-        return os.path.abspath(os.path.join(self.config.MAIN_DIRECTORY, *path))
-
-    def get_static_file_full_path(self, *path):
-        return os.path.abspath(os.path.join(self.config.STATIC_DIR, *path))
-
 
 config = Config()

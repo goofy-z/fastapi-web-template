@@ -25,7 +25,7 @@
 │   ├── storage  # SQLA相关
 │   └── utils  # 工具目录
 ├── docs  # 项目文档
-├── app.py  # 入口文件
+├── main.py  # 入口文件
 ├── manage.py  # manager工具
 ├── Dockerfile  # 就是一个DOckerfile
 ├── README.md
@@ -57,11 +57,16 @@ from core.storage import db
 db.engine.execute(...)
 ```
 
+逻辑删除,orm对象
+```python
+obj.delete()
+```
+
 ### 2.dependencies
 
 项目下所有的fastapi依赖注入函数都在`/core/dependencies`：
 
-- auth_dependen: 基础依赖注入，所有的AP都需要引入这个依赖，用于提取请求头中的`Accept-Language`来设置全局变量`local`, 用于`i18n`的翻译。
+- base_dependen: 基础依赖注入，所有的AP都需要引入这个依赖，用于提取请求头中的`Accept-Language`来设置全局变量`local`, 用于`i18n`的翻译。
 - auth_dependen: 基于`Authorization`请求头的JWT认证。
 
 ### 3. config
@@ -109,7 +114,7 @@ t = gettext("test") # t为翻译后的内容
 
 2. babel [add|run]
 
-   **add**: 检测代码中的引入了`gettext`的地方，并更新翻译文件`message.po`
+   **add**: 检测代码中的引入了`gettext`的地方，并更新翻译文件`message.po`, 之后需要手动填入翻译内容。
 
    **run**: 编译message.po。
 
@@ -117,7 +122,7 @@ t = gettext("test") # t为翻译后的内容
 
 项目下的`/core/middleware`是所有的ASGI的中间件，目前共有两个中间件
 
-- `fastapi-globals.py`： `g`对象的实现，基于contextvar实现
+- `fastapi-globals.py`： `g`对象的实现，基于contextvar
 - `session.py`: 注册全局`session`
 
 #### 8.websocket
@@ -141,3 +146,8 @@ token验证格式：
   "SessionID": "token"
 }
 ```
+
+#### 9.部署
+
+下载依赖：`pip3 install -r quirements.txt`
+启动项目：`python main.py`

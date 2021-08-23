@@ -26,7 +26,7 @@ class SQLAlchemy(object):
         return sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
 
 
-async def create_db(app=None, auto_create_table=config.DB_MIGRATION):
+async def create_db(app=None, auto_create_table=True):
     db.update_engine(config.DATABASE_URL, echo=config.SHOW_SQL)
     print("db init success")
     if auto_create_table:

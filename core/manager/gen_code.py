@@ -6,13 +6,14 @@ import sys
 from .base import CommandBase, str2camel
 
 
-apis_file = """
+apis_file = \
+"""
 from fastapi import APIRouter
 
 from core.dependencies import base_dependen
 from core.schema.base import DataSchema, PageSchema
-from app.{app_name}.views import list_{app_name}_view
-from app.{app_name}.schema import {AppName}ListResponse
+from app.{app_name}.views import list_{app_name}_view, create_{app_name}_view, delete_{app_name}_view
+from app.{app_name}.schema import {AppName}ListRes
 
 
 router = APIRouter(prefix="/v1/{app_name}", tags=["{app_name} project"])
@@ -22,26 +23,50 @@ router.add_api_route(
     path="/",
     endpoint=list_{app_name}_view,
     methods=["GET"],
-    response_model=PageSchema[{AppName}ListResponse],
+    response_model=PageSchema[{AppName}ListRes],
+    dependencies=[base_dependen,]
+)
+
+router.add_api_route(
+    name="create {app_name}",
+    path="/",
+    endpoint=create_{app_name}_view,
+    methods=["POST"],
+    dependencies=[base_dependen,]
+)
+
+router.add_api_route(
+    name="delete {app_name}",
+    path="/",
+    endpoint=delete_{app_name}_view,
+    methods=["DELETE"],
     dependencies=[base_dependen,]
 )
 """
 
-schema_file = """
+schema_file = \
+"""
 from typing import List, Optional
 from core.schema import BaseSchema
+from pydantic.fields import Field
 
 
-class {AppName}ListResponse(BaseSchema):
-    id: Optional[str] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
+class {AppName}ListRes(BaseSchema):
+    id: Optional[str] = Field(description="id")
+    name: Optional[str] = Field(description="名称")
+    description: Optional[str] = Field(description="描述")
+
+class {AppName}CreateReq(BaseSchema):
+    name: Optional[str] = Field(description="名称")
+    description: Optional[str] = Field(description="描述")
 
 """
 
-views_file = """
+views_file = \
+"""
 from typing import Any, Optional
-from app.{app_name}.{app_name} import list_{app_name}
+from app.{app_name}.{app_name} import list_{app_name}, create_{app_name}, delete_{app_name}
+from app.{app_name}.schema import {AppName}CreateReq
 
 
 async def list_{app_name}_view(
@@ -50,12 +75,23 @@ async def list_{app_name}_view(
 ):
     return await list_{app_name}(page, limit)
 
+async def create_{app_name}_view(item: {AppName}CreateReq):
+    await create_{app_name}(item.name, item.description)
+    return {{"data": "success"}}
+
+async def delete_{app_name}_view(record_id: str):
+    await delete_{app_name}(record_id)
+    return {{"data": "success"}}
+
 """
 
-app_util_file = """
-from sqlalchemy import select
+app_util_file = \
+"""
+from sqlalchemy import select, insert
 from core.middleware import g
 from core.schema import paginate_handler
+from core.utils.api_exception import NotFoundException
+from core.i18n import gettext
 from app.{app_name}.models import {AppName}
 
 
@@ -63,9 +99,20 @@ async def list_{app_name}(page: int, limit: int):
     stmt = select({AppName})
     return await paginate_handler(page=page, limit=limit, db=g.db, stmt=stmt)
 
+async def create_{app_name}(name: str, description: str):
+    return await g.db.execute(insert({AppName}).values({{"name": name, "description": description}}))
+
+async def delete_{app_name}(record_id: str):
+    obj = await g.db.get({AppName}, record_id)
+    if not obj:
+        raise NotFoundException(gettext("record not found"))
+    await obj.delete()
+    return
+
 """
 
-model_file = """
+model_file = \
+"""
 import uuid
 
 from core.storage import Base
@@ -74,8 +121,8 @@ from sqlalchemy import Column, String
 
 class {AppName}(Base):
     __tablename__ = "{app_name}"
-    id = Column(String(36), primary_key=True, default=str(uuid.uuid4))
-    name = Column(String(128), nullable=False, primary_key=True, unique=True)
+    id = Column(String(36), primary_key=True, default=str(uuid.uuid4()))
+    name = Column(String(128), nullable=False)
     description = Column(String(512), nullable=False)
 
 """
@@ -182,7 +229,7 @@ class StartAppCommand(CommandBase):
         register router and configure sqla model
         """
         new_c = []
-        with open("app_runner.py", "r+") as f:
+        with open("main.py", "r+") as f:
             f.seek(0)
             while True:
                 c = f.readline()
@@ -196,5 +243,5 @@ class StartAppCommand(CommandBase):
                     new_c.append(f"    # noinspection PyUnresolvedReferences\n")
                     new_c.append(f"    from app.{cls.app_name} import models\n\n")
 
-        with open("app_runner.py", "w") as f:
+        with open("main.py", "w") as f:
             f.writelines(new_c)
