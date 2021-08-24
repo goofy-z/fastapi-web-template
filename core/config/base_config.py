@@ -23,7 +23,7 @@ def str2float(v):
 
 class Base:
     # ------------------- need config ---------------------
-    DATABASE_MYSQL_URL = os.getenv("DATABASE_MYSQL_URL", "root:dangerous@127.0.0.1:3600/kongtianbei")
+    DATABASE_MYSQL_URL = os.getenv("DATABASE_MYSQL_URL", "root:dangerous@127.0.0.1:3306/test")
 
     # ------------------- option ---------------------
     CONFIG_NAME = "BASE"
