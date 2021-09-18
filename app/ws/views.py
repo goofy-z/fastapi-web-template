@@ -1,12 +1,10 @@
 import random
-import hashlib
 
 from typing import Optional
 from fastapi import WebSocket
 from starlette.responses import HTMLResponse
 from starlette.websockets import WebSocketDisconnect
 from app.ws.schema import BroadcastMsgReq
-
 
 from app.ws import manager
 from app.ws.ws import html
@@ -25,7 +23,7 @@ async def ws_view(
         while True:
             await manager.receive_json(websocket)
     except WebSocketDisconnect:
-        await manager.disconnect(websocket)
+        manager.remove_session(websocket)
 
 
 async def test_html_view():

@@ -1,11 +1,16 @@
 import json
+import logging
 
 import jwt
 import asyncio
 from typing import Dict, List
 from datetime import datetime, timedelta
 
-from fastapi import WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+
+app = FastAPI(debug=True)
+
+LOG = logging.getLogger(__name__)
 
 class ConnectionManager:
     _hb_handle = None  # heartbeat event loop timer
@@ -41,7 +46,9 @@ class ConnectionManager:
                 token = json.loads(token[0])
             elif not isinstance(token, dict):
                 token = json.loads(token)
-        except:
+        except WebSocketDisconnect:
+            return
+        except Exception as e:
             await self.send_personal_message(f"token error", session)
             await self.disconnect(session)
             return False
@@ -79,7 +86,8 @@ class ConnectionManager:
 
     async def broadcast(self, message: str):
         for connection in self.active_connections:
-            await connection.send_text(message)
+            msg = "a" + json.dumps([message])
+            await connection.send_text(msg)
 
     def start(self):
         # logging.info("start manager")
@@ -96,8 +104,19 @@ class ConnectionManager:
             self._hb_task = None
 
     async def disconnect(self, session: WebSocket):
+        """
+        关闭连接
+        """
         await session.close()
-        self.active_connections.remove(session)
+        self.remove_session(session)
+
+    def remove_session(self, session):
+        """
+        移除缓存的session
+        """
+        if session in self.active_connections:
+            LOG.info(f"session close {self.get_session_id(session)}")
+            self.active_connections.remove(session)
 
     def _heartbeat(self):
         """
@@ -112,7 +131,6 @@ class ConnectionManager:
         心跳检测
         """
         sessions = self.active_connections
-        # logging.info("start heartbeat")
         if sessions:
             now = datetime.now()
 
@@ -120,15 +138,17 @@ class ConnectionManager:
             while idx < len(sessions):
                 session = sessions[idx]
                 if session.expire_time < now:
+                    session_id = self.get_session_id(session)
                     # 删除超时session
                     try:
                         await self.send_personal_message("h time out", session)
+                        logging.warn(f"heart beat check timeout {session_id}")
                         await self.disconnect(session)
-                    except:
-                        ...
+                    except Exception as e:
+                        LOG.info(f"session {session_id} check failed {str(e)}")
                     continue
                 # 没有超时的设置下次超时时间, 但是索引不变
-                await self.send_personal_message("h", session)
+                await self.send_personal_message("h[]", session)
                 idx += 1
 
         self._hb_task = None
@@ -140,6 +160,16 @@ class ConnectionManager:
         刷新session的过期时间
         """
         setattr(session, "expire_time", datetime.now() + timedelta(seconds=self.heartbeat))
+
+    def get_session_id(self, session):
+        """
+        提取session的id
+        """
+        if hasattr(session, "user_id"):
+            session_id = session.user_id
+        else:
+            session_id = session.url
+        return session_id
 
 
 html = """
