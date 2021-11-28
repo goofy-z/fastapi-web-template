@@ -35,6 +35,7 @@ def register_router(app: FastAPI):
     """
     # +gencode:register-router
     from app.ws.apis import router as ws_router
+
     app.include_router(ws_router, prefix="/wss")
 
 
@@ -42,7 +43,6 @@ def init_sync(app):
     register_http_middleware(app)
     register_router(app)
     configure_models()
-
 
 
 def init_async():

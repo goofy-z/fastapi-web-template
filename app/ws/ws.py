@@ -12,6 +12,7 @@ app = FastAPI(debug=True)
 
 LOG = logging.getLogger(__name__)
 
+
 class ConnectionManager:
     _hb_handle = None  # heartbeat event loop timer
     _hb_task = None  # gc task
@@ -208,4 +209,3 @@ html = """
     </body>
 </html>
 """
-

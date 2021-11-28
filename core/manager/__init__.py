@@ -56,4 +56,5 @@ class ManagementUtility:
         executor = self.fetch_command(command)
         executor(*self.argv[2:])
 
+
 registry_command()

@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.functions import func
 
+
 async def paginate_handler(
     page: int,
     limit: int,

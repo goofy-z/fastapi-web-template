@@ -15,6 +15,7 @@ class EnumTypeMeta(type):
         注意：
             切记不要在代码中通过_values或其它属性改变枚举类定义的属性和值，虽然程序允许。
     """
+
     def __new__(cls, name, bases, attrs):
         _values = {}  # {属性:值}
         _labels = {}  # {属性:说明}
@@ -65,4 +66,3 @@ class EnumTypeMeta(type):
 
 class EnumType(metaclass=EnumTypeMeta):
     pass
-

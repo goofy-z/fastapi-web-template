@@ -18,7 +18,13 @@ class SQLAlchemy(object):
 
     def update_engine(self, database_url, echo):
         self.engine = create_async_engine(
-            database_url, echo=echo, pool_size=20, max_overflow=5, future=True, query_cache_size=1500  # 设置缓存sql条数
+            database_url,
+            echo=echo,
+            pool_size=config.DB_MAX_OVERFLOW,
+            max_overflow=config.DB_POOL_SIZE,
+            future=True,
+            pool_recycle=config.DB_POOL_RECYCLE,
+            query_cache_size=1500,  # 设置缓存sql条数
         )
         self.session = self.create_session()
 
@@ -35,6 +41,7 @@ async def create_db(app=None, auto_create_table=True):
 
     # show_sql控制, 收集每一条执行sql记录存放到g对象里，最终会在接口返回报文里添加这些记录
     if config.RETURN_SQL:
+
         @event.listens_for(db.engine.sync_engine, "before_cursor_execute")
         def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
             conn.info.setdefault("query_start_time", []).append(time.time())
@@ -44,6 +51,7 @@ async def create_db(app=None, auto_create_table=True):
             total = time.time() - conn.info["query_start_time"].pop(-1)
             tmp = [parameters] if not executemany else parameters
             from core.middleware import g
+
             for i in tmp:
                 g.sql_log.append({"sql": (statement % i).replace("\n", ""), "duration": f"{int(total * 1000)} ms"})
 

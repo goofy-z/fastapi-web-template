@@ -32,7 +32,12 @@ class _Model(HasPrivate):
         """
         soft delte
         """
-        await g.db.execute(update(self.__class__).where(self.__class__.id == self.id).values(
-            {"deleted": True, "deleted_at": datetime.now()}).execution_options(synchronize_session="evaluate"))
+        await g.db.execute(
+            update(self.__class__)
+            .where(self.__class__.id == self.id)
+            .values({"deleted": True, "deleted_at": datetime.now()})
+            .execution_options(synchronize_session="evaluate")
+        )
+
 
 Base = declarative_base(cls=_Model, name="Model")

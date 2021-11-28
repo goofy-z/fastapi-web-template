@@ -28,5 +28,5 @@ async def auth(Authorization: str = Header(...)):
     except Exception as e:
         msg = f"Bad token {str(e)}"
         return JSONResponse({"error_info": msg, "error_type": "auth_error"}, status_code=401)
-    # TODO check user_id 
+    # TODO check user_id
     g.user_id = payload.get("user_id")

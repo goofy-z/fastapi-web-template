@@ -1,4 +1,3 @@
-
 import shutil
 import os
 import sys
@@ -6,8 +5,7 @@ import sys
 from .base import CommandBase, str2camel
 
 
-apis_file = \
-"""
+apis_file = """
 from fastapi import APIRouter
 
 from core.dependencies import base_dependen
@@ -44,8 +42,7 @@ router.add_api_route(
 )
 """
 
-schema_file = \
-"""
+schema_file = """
 from typing import List, Optional
 from core.schema import BaseSchema
 from pydantic.fields import Field
@@ -62,8 +59,7 @@ class {AppName}CreateReq(BaseSchema):
 
 """
 
-views_file = \
-"""
+views_file = """
 from typing import Any, Optional
 from app.{app_name}.{app_name} import list_{app_name}, create_{app_name}, delete_{app_name}
 from app.{app_name}.schema import {AppName}CreateReq
@@ -85,8 +81,7 @@ async def delete_{app_name}_view(record_id: str):
 
 """
 
-app_util_file = \
-"""
+app_util_file = """
 from sqlalchemy import select, insert
 from core.middleware import g
 from core.schema import paginate_handler
@@ -111,8 +106,7 @@ async def delete_{app_name}(record_id: str):
 
 """
 
-model_file = \
-"""
+model_file = """
 import uuid
 
 from core.storage import Base
@@ -177,7 +171,7 @@ class StartAppCommand(CommandBase):
     def add_apis_file(cls):
         """
         创建目录和init文件
-        """        
+        """
         api_file_path = os.path.join(cls.root, f"apis.py")
         with open(api_file_path, "w") as f:
             f.write(cls.copyright_str)

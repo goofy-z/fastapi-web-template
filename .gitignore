@@ -91,12 +91,4 @@ ENV/
 .venv
 .vscode
 __pycache__
-app/unit_tests/.pytest_cache/v/cache
 .pytest_cache/v/cache
-app/code_template
-celerybeat-schedule.db
-docs/csp-dev.zip
-docs/csp.zip
-mock-broker.zip
-dsp-dev.zip
-brokers/app_broker/.pytest_cache/v/cache

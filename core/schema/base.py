@@ -34,4 +34,3 @@ class PageSchema(GenericModel, Generic[T]):
     total_count: int = Field(..., description="总条数")
     total_page: int = Field(..., description="总页数")
     current_page: int = Field(..., description="当前页")
-
