@@ -26,7 +26,7 @@ def configure_models():
     """
     add model to sqla metadata
     """
-    # +gencode:register-router
+    # +gencode:configure-model
 
 
 def register_router(app: FastAPI):
@@ -53,6 +53,8 @@ def init_async():
 
     if loop and loop.is_running():
         loop.create_task(create_db())
+        
+        # 注册websocket处理程序
         loop.create_task(create_ws_manager())
 
 
@@ -71,4 +73,4 @@ init_async()
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="debug", debug=not config.PROD)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="debug", debug=False)
