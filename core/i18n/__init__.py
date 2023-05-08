@@ -12,11 +12,11 @@ TRANSLATIONS = {
 }
 
 
-translations = TRANSLATIONS.get("en_US")
+translations = TRANSLATIONS.get("en-US")
 
 
 def gettext(msg: str):
     from core.middleware.fastapi_globals import g
 
-    t = TRANSLATIONS.get(g.locale) if g.locale else TRANSLATIONS.get("en_US")
+    t = TRANSLATIONS.get(g.locale) if g.locale else TRANSLATIONS.get("en-US")
     return t.ugettext(msg)
